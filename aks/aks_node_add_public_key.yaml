@@ -8,35 +8,35 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   labels:
-    k8s-app: ec2-public-key
-  name: ec2-public-key
+    k8s-app: vm-public-key
+  name: vm-public-key
   namespace: default
 spec:
   selector:
     matchLabels:
-      k8s-app: ec2-public-key
+      k8s-app: vm-public-key
   template:
     metadata:
       labels:
-        k8s-app: ec2-public-key
+        k8s-app: vm-public-key
     spec:
       containers:
-      - image: amazonlinux
+      - image: nginx
         imagePullPolicy: Always
-        name: ec2pubkey
+        name: vmpubkey
         command: ["/bin/bash"]
-        args: ["-c","echo 'ssh-rsa <YOUR_ID_RSA_PUB_KEY> me@me.com' >> /etc/ec2home/.ssh/authorized_keys && chown -R 1000:1000 /etc/ec2home/.ssh && chmod 600  /etc/ec2home/.ssh/authorized_keys && sleep 5000"]
+        args: ["-c","echo 'ssh-rsa <YOUR_ID_RSA_PUB_KEY> me@me.com' >> /etc/vmhome/.ssh/authorized_keys && chown -R 1000:1000 /etc/vmhome/.ssh && chmod 600  /etc/vmhome/.ssh/authorized_keys && sleep 5000"]
         securityContext:
           allowPrivilegeEscalation: true
         volumeMounts:
-        - mountPath: /etc/ec2home
-          name: ec2home    
+        - mountPath: /etc/vmhome
+          name: vmhome    
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
       volumes:
-      - name: ec2home
+      - name: vmhome
         hostPath:
-          path: /home/ec2-user
+          path: /home/vm-user
           type: Directory  
       dnsPolicy: ClusterFirst
       restartPolicy: Always
